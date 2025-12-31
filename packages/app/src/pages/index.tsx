@@ -43,6 +43,36 @@ const HomePage: NextPage = () => {
 		groupOptions.at(0)?.group ?? '',
 	);
 
+	const filteredOpenings: Opening[] = (longLineOpenings as Opening[]).filter(
+		({ group }) => selectedGroup === group,
+	);
+
+	const scrollToSlide = (slideIndex: number) => {
+		const el = document.getElementById(slideIndex.toString());
+		if (el) {
+			el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	};
+
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				const next = Math.min(activeSlide + 1, filteredOpenings.length);
+				scrollToSlide(next);
+			}
+
+			if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				const prev = Math.max(activeSlide - 1, 1);
+				scrollToSlide(prev);
+			}
+		};
+
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	}, [activeSlide, filteredOpenings.length]);
+
 	// Use the IntersectionObserver API to detect which slide is active
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -66,17 +96,13 @@ const HomePage: NextPage = () => {
 		};
 	}, [selectedGroup]);
 
-	const filteredOpenings: Opening[] = (longLineOpenings as Opening[]).filter(
-		({ group }) => selectedGroup === group,
-	);
-
 	return (
-		<div className="flex h-screen w-screen flex-col gap-y-4 overflow-hidden p-4 md:gap-y-8 md:p-8">
-			<div className="mx-auto w-full max-w-xs">
+		<div className="flex h-screen w-screen flex-col gap-y-0 overflow-hidden p-0 md:gap-y-8 md:p-8">
+			<div className="mx-auto w-full max-w-sm">
 				<select
 					id="group"
 					name="group"
-					className="select w-full"
+					className="select w-full focus:outline-none"
 					value={selectedGroup}
 					onChange={(event: ChangeEvent<HTMLSelectElement>) => {
 						setActiveSlide(0);
@@ -99,28 +125,23 @@ const HomePage: NextPage = () => {
 					})}
 				</select>
 			</div>
-			<div className="h-full grow snap-y snap-mandatory overflow-y-auto scroll-smooth">
+			<div className="scrollbar-none h-full grow snap-y snap-mandatory overflow-y-auto scroll-smooth">
 				{filteredOpenings.map((opening: Opening, index: number) => (
 					<div
 						id={(index + 1).toString()}
 						key={`${opening.eco.toString()}-${opening.name.toString().replaceAll(' ', '-').replaceAll(':', ' ')}-${index}`} // Add an ID to each slide
 						className="slide flex h-full snap-start items-center justify-center">
 						{/* Aspect Ratio for Video - set directly on the container */}
-						<div className="border-base-300 relative flex h-full max-h-fit w-full max-w-xs flex-col overflow-hidden rounded border shadow-2xl">
-							<div className="border-base-300 border-b p-2 md:p-4">
-								<h1 className="truncate text-center font-black">
-									{opening.group}
-								</h1>
-							</div>
+						<div className="border-base-300 relative flex h-full max-h-fit w-full max-w-sm flex-col overflow-hidden border shadow-2xl">
 							<div className="flex h-full w-full grow items-center justify-center">
 								<ChessOpening
 									pgn={opening.pgn}
 									isAutoPlay={activeSlide === index + 1}
 								/>
 							</div>
-							<div className="border-base-300 flex w-full flex-col gap-y-1 border-t p-2 md:p-4">
+							<div className="border-base-300 flex w-full flex-col gap-y-1 border-t px-2 py-1 md:px-4 md:py-2">
 								<h2 className="truncate font-semibold">
-									{index + 1}/{filteredOpenings.length}. {opening.name}
+									{index + 1}/{filteredOpenings.length}. {opening.subgroup}
 								</h2>
 								<p className="text-primary line-clamp-3 text-xs">
 									{opening.pgn}
