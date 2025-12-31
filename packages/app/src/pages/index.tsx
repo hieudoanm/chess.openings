@@ -98,7 +98,7 @@ const HomePage: NextPage = () => {
 
 	return (
 		<div className="flex h-screen w-screen flex-col gap-y-0 overflow-hidden p-0 md:gap-y-8 md:p-8">
-			<div className="mx-auto w-full max-w-sm">
+			<div className="mx-auto w-full max-w-md md:max-w-sm">
 				<select
 					id="group"
 					name="group"
@@ -132,7 +132,7 @@ const HomePage: NextPage = () => {
 						key={`${opening.eco.toString()}-${opening.name.toString().replaceAll(' ', '-').replaceAll(':', ' ')}-${index}`} // Add an ID to each slide
 						className="slide flex h-full snap-start items-center justify-center">
 						{/* Aspect Ratio for Video - set directly on the container */}
-						<div className="border-base-300 relative flex h-full max-h-fit w-full max-w-sm flex-col overflow-hidden border shadow-2xl">
+						<div className="border-base-300 relative flex h-full max-h-fit w-full max-w-md flex-col overflow-hidden border shadow-2xl md:max-w-sm">
 							<div className="flex h-full w-full grow items-center justify-center">
 								<ChessOpening
 									pgn={opening.pgn}
