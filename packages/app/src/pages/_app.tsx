@@ -19,6 +19,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 		<>
 			<Head>
 				<title>Chess Openings</title>
+				<link rel="manifest" href="/manifest.json" />
 			</Head>
 			<div className={`${geistSans.className} ${geistMono.className}`}>
 				<Component {...pageProps} />
