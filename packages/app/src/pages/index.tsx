@@ -139,7 +139,7 @@ const HomePage: NextPage = () => {
 									isAutoPlay={activeSlide === index + 1}
 								/>
 							</div>
-							<div className="border-base-300 flex w-full flex-col gap-y-1 border-t px-2 py-1 md:px-4 md:py-2">
+							<div className="border-base-300 flex w-full flex-col gap-y-2 border-t px-4 py-2 md:gap-y-4 md:px-8 md:py-4">
 								<h2 className="truncate font-semibold">
 									{index + 1}/{filteredOpenings.length}. {opening.subgroup}
 								</h2>
