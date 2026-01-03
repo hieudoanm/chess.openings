@@ -6,6 +6,11 @@
   - [Table of Contents](#table-of-contents)
   - [Openings Principals](#openings-principals)
   - [Openings](#openings)
+    - [White](#white)
+      - [Catalan Opening](#catalan-opening)
+    - [Black](#black)
+      - [Caro-Kann Defense](#caro-kann-defense)
+      - [Queen's Gambit Declined](#queens-gambit-declined)
 
 ## Openings Principals
 
@@ -26,3 +31,13 @@
 15. Be ready to transition to the middle game: Once development is complete, shift focus to plans, pawn breaks, and piece activity.
 
 ## Openings
+
+### White
+
+#### Catalan Opening
+
+### Black
+
+#### Caro-Kann Defense
+
+#### Queen's Gambit Declined

@@ -2,7 +2,6 @@ import io
 from typing import TypedDict
 import json
 import pandas
-import chess.pgn
 from stockfish import Stockfish
 from re import sub
 from chess_gif.gif_maker import GIFMaker
@@ -29,11 +28,6 @@ def get_moves(pgn: str) -> list[str]:
     return moves
 
 
-def get_half_moves(pgn: str) -> int:
-    moves: list[str] = get_moves(pgn)
-    return len(moves)
-
-
 def get_main_line_score(pgn: str, pgn_list: list[str]) -> int:
     moves_list: list[list[str]] = [get_moves(pgn_item) for pgn_item in pgn_list]
     moves: list[str] = get_moves(pgn)
@@ -54,15 +48,6 @@ def get_main_line_score(pgn: str, pgn_list: list[str]) -> int:
     return index
 
 
-def get_fen(pgn: str) -> str:
-    pgn_string = io.StringIO(pgn)
-    game = chess.pgn.read_game(pgn_string)
-    board = game.board()
-    for move in game.mainline_moves():
-        board.push(move)
-    return board.fen()
-
-
 def get_evaluation(fen: str) -> float:
     stockfish.set_fen_position(fen)
     evaluation: dict = stockfish.get_evaluation()
@@ -79,15 +64,6 @@ def get_value_or_empty(lst, index):
 
 unique_openings_data_frame = pandas.DataFrame(unique_openings)
 pgn_list: list[str] = unique_openings_data_frame["pgn"].tolist()
-unique_openings_data_frame["first"] = unique_openings_data_frame["pgn"].apply(
-    lambda pgn: f"{get_value_or_empty(pgn.split(' '), 1)}-{get_value_or_empty(pgn.split(' '), 2)}"
-)
-unique_openings_data_frame["half_moves"] = unique_openings_data_frame["pgn"].apply(
-    lambda pgn: get_half_moves(pgn)
-)
-unique_openings_data_frame["fen"] = unique_openings_data_frame["pgn"].apply(
-    lambda pgn: get_fen(pgn)
-)
 unique_openings_data_frame["evaluation"] = unique_openings_data_frame["fen"].apply(
     lambda fen: get_evaluation(fen)
 )
@@ -98,7 +74,7 @@ unique_openings_data_frame["main_line_score"] = unique_openings_data_frame["pgn"
     lambda pgn: get_main_line_score(pgn, pgn_list)
 )
 unique_openings_data_frame: pandas.DataFrame = unique_openings_data_frame.sort_values(
-    by=["first", "name", "pgn", "main_line_score"]
+    by=["group", "subgroup", "name", "first", "pgn", "main_line_score"]
 )
 unique_openings_data_frame.to_csv("./openings/unique.csv", index=False)
 

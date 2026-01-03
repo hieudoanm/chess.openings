@@ -3,47 +3,45 @@ import { Opening, openings } from '@chess.openings/data/openings';
 import { NextPage } from 'next';
 import { ChangeEvent, useEffect, useState } from 'react';
 
-const longLineOpenings: Opening[] = openings.filter(({ pgn }) => {
-	const moves = pgn.split(' ').filter((_, index) => index % 3 === 0);
-	return moves.length >= 10;
-});
-
-const groups: string[] = [
-	...new Set(longLineOpenings.map(({ group }) => group)),
-];
+const groups: string[] = [...new Set(openings.map(({ group }) => group))];
 
 const groupOptions = groups
-	.map((group) => {
-		const filteredOpenings = longLineOpenings.filter(
-			({ group: groupOption }) => group === groupOption,
+	.map((group: string) => {
+		const filteredOpenings = openings.filter(
+			({ group: groupValue }) => group === groupValue,
 		);
+
+		const subgroups: string[] = [
+			...new Set(filteredOpenings.map(({ subgroup = '' }) => subgroup ?? '')),
+		].sort((a: string, b: string) => (a > b ? 1 : -1));
+
 		const total: number = filteredOpenings.length;
-		const superGroup: string =
-			(filteredOpenings.at(0)?.pgn ?? '').split(' ').at(1) ?? '';
-		return { superGroup, group, total };
+
+		const subgroupOptions = subgroups.map((subgroup: string) => {
+			const filteredOpenings = openings.filter(
+				({ group: groupValue, subgroup: subgroupValue }) => {
+					return group === groupValue && subgroup === subgroupValue;
+				},
+			);
+			const total: number = filteredOpenings.length;
+
+			return { subgroup, total };
+		});
+
+		return { group, total, subgroups: subgroupOptions };
 	})
 	.sort((a, b) => {
-		if (a.superGroup === b.superGroup) {
-			if (a.total === b.total) {
-				return a.group > b.group ? 1 : -1;
-			}
-			return a.total > b.total ? 1 : -1;
-		}
-		return a.superGroup > b.superGroup ? 1 : -1;
+		return a.group > b.group ? 1 : -1;
 	});
-
-const superGroupOptions = [
-	...new Set(groupOptions.map(({ superGroup }) => superGroup)),
-];
 
 const HomePage: NextPage = () => {
 	const [activeSlide, setActiveSlide] = useState<number>(1); // To track active slide
-	const [selectedGroup, setSelectedGroup] = useState(
-		groupOptions.at(0)?.group ?? '',
+	const [selectedSubgroup, setSelectedSubgroup] = useState(
+		groupOptions.at(0)?.subgroups.at(0)?.subgroup ?? '',
 	);
 
-	const filteredOpenings: Opening[] = (longLineOpenings as Opening[]).filter(
-		({ group }) => selectedGroup === group,
+	const filteredOpenings: Opening[] = openings.filter(
+		({ subgroup = '' }) => (selectedSubgroup || '') === (subgroup || ''),
 	);
 
 	const scrollToSlide = (slideIndex: number) => {
@@ -93,7 +91,7 @@ const HomePage: NextPage = () => {
 		return () => {
 			slides.forEach((slide) => observer.unobserve(slide));
 		};
-	}, [selectedGroup]);
+	}, [selectedSubgroup]);
 
 	return (
 		<div className="flex h-screen w-screen flex-col gap-y-0 overflow-hidden p-0 md:gap-y-8 md:p-8">
@@ -102,23 +100,21 @@ const HomePage: NextPage = () => {
 					id="group"
 					name="group"
 					className="select w-full focus:outline-none"
-					value={selectedGroup}
+					value={selectedSubgroup}
 					onChange={(event: ChangeEvent<HTMLSelectElement>) => {
 						setActiveSlide(0);
-						setSelectedGroup(event.target.value);
+						setSelectedSubgroup(event.target.value);
 					}}>
-					{superGroupOptions.map((superGroupOption) => {
+					{groupOptions.map(({ group = '', subgroups = [], total }) => {
 						return (
-							<optgroup key={superGroupOption} label={superGroupOption}>
-								{groupOptions
-									.filter(({ superGroup }) => superGroup === superGroupOption)
-									.map(({ group, total }) => {
-										return (
-											<option key={group} value={group}>
-												{group} ({total})
-											</option>
-										);
-									})}
+							<optgroup key={group} label={`${group} (${total})`}>
+								{subgroups.map(({ subgroup, total = 0 }) => {
+									return (
+										<option key={subgroup} value={subgroup ?? ''}>
+											{group} - {subgroup || '<empty>'} ({total})
+										</option>
+									);
+								})}
 							</optgroup>
 						);
 					})}
