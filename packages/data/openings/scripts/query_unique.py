@@ -1,4 +1,5 @@
 import json
+import pandas
 from typing import TypedDict
 
 
@@ -28,10 +29,21 @@ unique_openings = list(
 )
 
 
-with open("./openings/unique.json", "w", encoding="utf-8") as unique_openings_json_file:
+unique_openings_dataframe = pandas.DataFrame(unique_openings)
+unique_openings_dataframe = unique_openings_dataframe.sort_values(
+    by=["group", "subgroup", "pgn"], ascending=[True, True, True], kind="stable"
+)
+
+
+sorted_unique_openings = unique_openings_dataframe.to_dict(orient="records")
+
+
+with open(
+    "./openings/unique.json", "w", encoding="utf-8"
+) as sorted_unique_openings_json_file:
     json.dump(
-        unique_openings,
-        unique_openings_json_file,
+        sorted_unique_openings,
+        sorted_unique_openings_json_file,
         ensure_ascii=False,
         indent=2,
     )

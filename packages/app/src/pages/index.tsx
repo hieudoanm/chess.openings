@@ -1,6 +1,5 @@
 import { ChessOpening } from '@chess.openings/components/ChessOpening';
-import openings from '@chess.openings/data/openings.json';
-import { Opening } from '@chess.openings/types/chess.types';
+import { Opening, openings } from '@chess.openings/data/openings';
 import { NextPage } from 'next';
 import { ChangeEvent, useEffect, useState } from 'react';
 
